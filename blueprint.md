@@ -2,37 +2,55 @@
 
 ## Overview
 
-This application provides a simple and elegant way to generate a random daily practice routine. The user is presented with a clean interface featuring a title and a button. Clicking the button, "오늘의 수련 생성" (Generate Today's Practice), randomly selects and displays three distinct routines from a predefined list.
+This application provides a simple and elegant way to generate a random daily practice routine. The user is presented with a clean, dark-themed interface featuring a title and a button. Clicking the button, "오늘의 수련 생성" (Generate Today's Practice), randomly selects and displays three distinct routines from a predefined list. For routines based on time or repetitions, users can click on the routine card to start an interactive countdown timer or a repetition decrementer.
 
 ## Style and Design
 
-*   **Theme:** Dark mode, with a minimalist and modern aesthetic.
-*   **Layout:** Centered content with a flexbox layout.
+*   **Theme:** Dark mode, with a minimalist and focused aesthetic.
+*   **Layout:** Centered content, with a responsive grid for the routine cards.
 *   **Color Palette:**
-    *   Background: `#121212` (dark grey)
-    *   Container: `#1e1e1e` (slightly lighter grey)
-    *   Text: `#ffffff` (white)
-    *   Card Background: `#2a2a2a` (medium grey)
-    *   Card Border: `#333` (darker grey)
-    *   Button: Transparent with a white border, changing to a white background with dark text on hover.
-*   **Typography:** 'Helvetica Neue' or a similar sans-serif font is used for a clean, modern look. The title has a larger font size and a lighter font-weight to give it an elegant feel.
-*   **Spacing:** Generous padding and margins are used to create a spacious and uncluttered layout.
+    *   Background: `#121212`
+    *   Text: `#ffffff`
+    *   Button Border: `white`
+    *   Card Background: `#2a2a2a`
+*   **Typography:** 'Arial', sans-serif for a clear, legible look.
+*   **Spacing:** Ample padding and margins for a spacious and uncluttered layout.
 *   **Components:**
-    *   **Container:** A rounded-corner container with a subtle box-shadow holds the main content.
-    *   **Button:** A stylized button with a hover effect provides a clear call to action.
-    *   **Routine Cards:** The generated routines are displayed in individual cards with a clean and organized layout.
+    *   **Button:** A transparent button with a white border that inverts colors on hover.
+    *   **Routine Cards:** The generated routines are displayed in individual cards. Cards are clickable to activate timers and have a subtle lift effect on hover.
+    *   **Timer:** A digital timer display appears for time-based routines.
+    *   **Rep Counter:** The repetition count dynamically updates for rep-based routines.
 
 ## Features
 
-*   **Random Routine Generation:** Clicking the "오늘의 수련 생성" button generates three unique routines from the following list:
-    *   1번 동작 - 10회
-    *   2번 동작 - 1회
-    *   3번 동작 - 10회
-    *   4번 동작 - 100회
-    *   C무브 - 10분
-    *   T무브 - 300회
-    *   L무브 - 300회
-    *   SC무브 - 10분
-    *   호흡 집중 - 5분
-    *   자애 명상 - 5분
-*   **Dynamic Display:** The generated routines are displayed dynamically on the page without requiring a page reload.
+*   **Random Routine Generation:** Clicking the "오늘의 수련 생성" button generates three unique routines.
+*   **Interactive Timers:**
+    *   Routines with a duration in minutes (e.g., "5분") are interactive. Clicking the card starts a countdown timer displayed in `MM:SS` format.
+    *   Routines measured in repetitions (e.g., "10회") are also interactive. Clicking the card starts a timer that decrements the repetition count at a predefined interval for that specific routine.
+    *   The intervals are:
+        *   '1번 동작': 60초
+        *   '3번 동작': 30초
+        *   '4번 동작': 5초
+        *   'T무브': 2초
+        *   'L무브': 3초
+    *   Clicking a card with a running timer will reset and restart it.
+    *   When a timer or counter finishes, it displays "완료!".
+*   **Dynamic Display:** All updates happen dynamically without a page reload.
+
+## Current Change: Repetition-Based Timers
+
+### Plan and Steps
+
+1.  **Modify `main.js` (`routines` array):**
+    *   **Done:** Added an `interval` property (in milliseconds) to each repetition-based routine object to define its decrement speed.
+2.  **Modify `main.js` (Event Handling):**
+    *   **Done:** Added a condition to check for rep-based routines (`.reps.includes('회')`) that have an `interval`.
+    *   **Done:** Attached a click event listener to these routines that calls a new `handleRepTimer` function.
+3.  **Implement `handleRepTimer` function in `main.js`:**
+    *   **Done:** The function takes the routine card, routine object, and a unique ID as arguments.
+    *   **Done:** It clears any existing timer for that card to allow resetting.
+    *   **Done:** It uses `setInterval` with the routine's specific `interval` to create the countdown.
+    *   **Done:** In each interval, it decrements the repetition count and updates the text on the card.
+    *   **Done:** When the count reaches zero, it clears the interval and displays "완료!".
+4.  **Update `blueprint.md`:**
+    *   **Done:** Corrected the feature list to include the functionality of repetition-based timers.
