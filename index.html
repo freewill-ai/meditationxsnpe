@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Order Within - Daily Practice</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="header-info">
+        <div id="datetime-container" class="datetime"></div>
+        <button id="capture-btn">화면 저장</button>
+    </div>
+    <div class="container" id="main-container">
         <h1>New Order Within - Daily Practice</h1>
-        <button id="generate-btn">오늘의 수련 생성</button>
+        <div class="button-group">
+            <button id="generate-btn">오늘의 수련 생성</button>
+            <button id="snpe-basic-btn">SNPE 기본동작</button>
+        </div>
         <div id="routine" class="routine-container"></div>
     </div>
     <audio id="start-sound" src="sounds/singing-bowl.mp3"></audio>

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This application provides a simple and elegant way to generate a random daily practice routine. The user is presented with a clean, dark-themed interface featuring a title and a button. Clicking the button, "오늘의 수련 생성" (Generate Today's Practice), randomly selects and displays three distinct routines from a predefined list. For routines based on time or repetitions, users can click on the routine card to start an interactive countdown timer or a repetition decrementer.
+This application provides a simple and elegant way to generate a daily practice routine. Users can either generate a random routine consisting of three exercises or display the eight core SNPE basic movements. The interface is clean and dark-themed, featuring interactive routine cards with built-in timers and repetition counters.
 
 ## Style and Design
 
@@ -11,46 +11,43 @@ This application provides a simple and elegant way to generate a random daily pr
 *   **Color Palette:**
     *   Background: `#121212`
     *   Text: `#ffffff`
-    *   Button Border: `white`
-    *   Card Background: `#2a2a2a`
+    *   Card Background: `#2c2c2c`
+    *   Primary Button (Random): `#bb86fc` (Purple)
+    *   Secondary Button (Basic): `#03dac6` (Teal)
 *   **Typography:** 'Arial', sans-serif for a clear, legible look.
 *   **Spacing:** Ample padding and margins for a spacious and uncluttered layout.
 *   **Components:**
-    *   **Button:** A transparent button with a white border that inverts colors on hover.
-    *   **Routine Cards:** The generated routines are displayed in individual cards. Cards are clickable to activate timers and have a subtle lift effect on hover.
-    *   **Timer:** A digital timer display appears for time-based routines.
-    *   **Rep Counter:** The repetition count dynamically updates for rep-based routines.
+    *   **Button Group:** A centered container for the two main action buttons.
+    *   **Buttons:** Styled with rounded corners, hover effects, and distinct colors for different actions.
+    *   **Routine Cards:** Display routine name and repetitions/duration. Cards are clickable if they have an interactive timer.
+    *   **Timer/Counter:** A digital display that appears when a routine is active.
 
 ## Features
 
-*   **Random Routine Generation:** Clicking the "오늘의 수련 생성" button generates three unique routines.
-*   **Interactive Timers:**
-    *   Routines with a duration in minutes (e.g., "5분") are interactive. Clicking the card starts a countdown timer displayed in `MM:SS` format.
-    *   Routines measured in repetitions (e.g., "10회") are also interactive. Clicking the card starts a timer that decrements the repetition count at a predefined interval for that specific routine.
-    *   The intervals are:
-        *   '1번 동작': 60초
-        *   '3번 동작': 30초
-        *   '4번 동작': 5초
-        *   'T무브': 2초
-        *   'L무브': 3초
-    *   Clicking a card with a running timer will reset and restart it.
-    *   When a timer or counter finishes, it displays "완료!".
-*   **Dynamic Display:** All updates happen dynamically without a page reload.
+*   **오늘의 수련 생성 (Random Routine):** Generates three unique routines randomly from the full exercise list.
+*   **SNPE 기본동작 (Basic Movements):** Displays the eight core SNPE movements (1-4, C, T, L, SC Move) in order.
+*   **Interactive Timers & Counters:**
+    *   **Time-based:** Countdown in `MM:SS` format.
+    *   **Rep-based:** Decrements repetition count at specific intervals (e.g., T-move every 2 seconds).
+    *   **Audio Feedback:** Plays a sound when a timer starts, reaches midpoint, and completes.
+    *   **Exclusive Timers:** Starting a new timer automatically stops any other running timer.
+*   **Dynamic UI:** All updates happen dynamically without a page reload.
 
-## Current Change: Repetition-Based Timers
+## Current Change: SNPE Basic Movements Button
 
 ### Plan and Steps
 
-1.  **Modify `main.js` (`routines` array):**
-    *   **Done:** Added an `interval` property (in milliseconds) to each repetition-based routine object to define its decrement speed.
-2.  **Modify `main.js` (Event Handling):**
-    *   **Done:** Added a condition to check for rep-based routines (`.reps.includes('회')`) that have an `interval`.
-    *   **Done:** Attached a click event listener to these routines that calls a new `handleRepTimer` function.
-3.  **Implement `handleRepTimer` function in `main.js`:**
-    *   **Done:** The function takes the routine card, routine object, and a unique ID as arguments.
-    *   **Done:** It clears any existing timer for that card to allow resetting.
-    *   **Done:** It uses `setInterval` with the routine's specific `interval` to create the countdown.
-    *   **Done:** In each interval, it decrements the repetition count and updates the text on the card.
-    *   **Done:** When the count reaches zero, it clears the interval and displays "완료!".
+1.  **Modify `index.html`:**
+    *   Wrapped the buttons in a `.button-group` div.
+    *   Added the "SNPE 기본동작" button with ID `snpe-basic-btn`.
+2.  **Modify `style.css`:**
+    *   Added styles for `.button-group` to align buttons horizontally with a gap.
+    *   Generalised button styles and added specific colors for `generate-btn` (purple) and `snpe-basic-btn` (teal).
+    *   Added hover effects and subtle shadows.
+3.  **Modify `main.js`:**
+    *   Defined `snpeBasicNames` array containing the 8 core movement names.
+    *   Created a `clearTimers()` helper function to reset state and clear intervals.
+    *   Added an event listener for `snpeBasicBtn` that filters the `routines` array for the 8 core movements and displays them.
+    *   Refactored `generateBtn` listener to use `clearTimers()`.
 4.  **Update `blueprint.md`:**
-    *   **Done:** Corrected the feature list to include the functionality of repetition-based timers.
+    *   Updated the overview, design, and features sections to include the new button and layout changes.
