@@ -45,10 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: '1번 동작', reps: '10회', interval: 90000 },
         { name: '2번 동작', reps: '5분' },
         { name: '3번 동작', reps: '10회', interval: 60000 },
-        { name: '4번 동작', reps: '100회', interval: 5000 },
+        { name: '4번 동작', reps: '100회', interval: 4500 },
         { name: 'C무브', reps: '10분' },
-        { name: 'T무브', reps: '300회', interval: 1500, restInterval: 50, restDuration: 30000 },
-        { name: 'L무브', reps: '300회', interval: 2500, restInterval: 100, restDuration: 60000 },
+        { name: 'T무브', reps: '300회', interval: 1300, restInterval: 30, restDuration: 30000 },
+        { name: 'L무브', reps: '300회', interval: 2300, restInterval: 50, restDuration: 40000 },
         { name: 'SC무브', reps: '10분' },
         { name: '호흡 집중', reps: '5분' },
         { name: '자애 명상', reps: '5분' },
@@ -58,10 +58,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const generateBtn = document.getElementById('generate-btn');
     const snpeBasicBtn = document.getElementById('snpe-basic-btn');
+    const intensiveBtn = document.getElementById('intensive-btn');
+    const modeToggleBtn = document.getElementById('mode-toggle-btn');
     const routineContainer = document.getElementById('routine');
     const startSound = document.getElementById('start-sound');
     const completionSound = document.getElementById('completion-sound');
+    
+    // Set volume to 20%
+    if (startSound) startSound.volume = 0.2;
+    if (completionSound) completionSound.volume = 0.2;
     let timersState = {}; // Holds the state of all timers
+
+    modeToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+    });
 
     function clearTimers() {
         Object.values(timersState).forEach(state => {
@@ -76,12 +86,26 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimers();
 
         const selectedRoutines = [];
-        while (selectedRoutines.length < 3) {
+        let targetCount = 3;
+        const meditationNames = ['호흡 집중', '자애 명상'];
+
+        while (selectedRoutines.length < targetCount) {
             const randomIndex = Math.floor(Math.random() * routines.length);
             const candidate = routines[randomIndex];
-            if (!selectedRoutines.some(r => r.name === candidate.name)) {
-                selectedRoutines.push(candidate);
+            
+            // Prevent duplicate selection
+            if (selectedRoutines.some(r => r.name === candidate.name)) continue;
+
+            // Prevent simultaneous selection of '호흡 집중' and '자애 명상'
+            if (meditationNames.includes(candidate.name)) {
+                const otherMeditation = meditationNames.find(name => name !== candidate.name);
+                if (selectedRoutines.some(r => r.name === otherMeditation)) continue;
+                
+                // If a meditation is selected, we want 4 routines in total
+                targetCount = 4;
             }
+
+            selectedRoutines.push(candidate);
         }
         createRoutineCards(selectedRoutines);
     });
@@ -93,6 +117,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const selectedRoutines = snpeBasicNames.map(name => routines.find(r => r.name === name)).filter(Boolean);
         createRoutineCards(selectedRoutines);
+    });
+
+    intensiveBtn.addEventListener('click', () => {
+        routineContainer.innerHTML = '';
+        routineContainer.classList.remove('grid-layout');
+        clearTimers();
+
+        const intensiveRoutines = [
+            { name: '1번 동작', reps: '30회', interval: 80000 },
+            { name: '2번 동작', reps: '30분' },
+            { name: '3번 동작', reps: '30회', interval: 60000 },
+            { name: '4번 동작', reps: '1000회', interval: 4500 },
+            { name: 'T무브', reps: '1000회', interval: 1300, restInterval: 30, restDuration: 30000 },
+            { name: 'L무브', reps: '1000회', interval: 2300, restInterval: 50, restDuration: 40000 }
+        ];
+        createRoutineCards(intensiveRoutines);
     });
 
     function handleCardClick(card, routine, id) {
@@ -157,9 +197,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                const min = Math.floor(remaining / 60);
-                const sec = remaining % 60;
-                timerDisplay.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+                // Count up: total - remaining
+                const elapsed = total - remaining;
+                const min = Math.floor(elapsed / 60);
+                const sec = elapsed % 60;
+                
+                if (elapsed > 0) {
+                    timerDisplay.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+                } else {
+                    timerDisplay.textContent = "00:00";
+                }
 
                 if (!state.midpointSoundPlayed && remaining <= state.midpoint) {
                     startSound.currentTime = 0;
@@ -186,12 +233,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const updateDisplay = () => {
                 if (!timersState[id]) return;
                 
+                // Show completed reps during rest, otherwise show current rep (1, 2, 3...)
+                const displayCount = state.isResting ? (total - remaining) : (total - remaining + 1);
+                // Don't show total+1 when finished
+                const finalDisplay = (remaining === 0 && !state.isResting) ? "완료!" : displayCount;
+
                 if (state.isResting) {
-                    timerDisplay.innerHTML = `${remaining} <span class="sub-timer">(Rest ${state.restRemainingSeconds}s)</span>`;
+                    timerDisplay.innerHTML = `${finalDisplay} <span class="sub-timer">(Rest ${state.restRemainingSeconds}s)</span>`;
                 } else if (hasSubTimer) {
-                    timerDisplay.innerHTML = `${remaining} <span class="sub-timer">(${state.currentIntervalSeconds}s)</span>`;
+                    timerDisplay.innerHTML = `${finalDisplay} <span class="sub-timer">(${state.currentIntervalSeconds}s)</span>`;
                 } else {
-                    timerDisplay.textContent = remaining;
+                    timerDisplay.textContent = finalDisplay;
                 }
             };
 
@@ -216,16 +268,19 @@ document.addEventListener('DOMContentLoaded', () => {
                             remaining--;
                             state.remaining = remaining;
                             state.repsSinceLastRest++;
-                            
+
                             if (routine.restInterval && state.repsSinceLastRest >= routine.restInterval && remaining > 0) {
                                 state.isResting = true;
                                 state.restRemainingSeconds = routine.restDuration / 1000;
                                 state.repsSinceLastRest = 0;
+                                // Reset interval seconds for when we resume
+                                state.currentIntervalSeconds = routine.interval / 1000;
                             } else {
                                 state.currentIntervalSeconds = routine.interval / 1000;
                             }
                         }
-                    } else {
+                    }
+ else {
                         remaining--;
                         state.remaining = remaining;
                     }

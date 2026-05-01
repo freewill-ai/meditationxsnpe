@@ -24,30 +24,27 @@ This application provides a simple and elegant way to generate a daily practice 
 
 ## Features
 
-*   **오늘의 수련 생성 (Random Routine):** Generates three unique routines randomly from the full exercise list.
-*   **SNPE 기본동작 (Basic Movements):** Displays the eight core SNPE movements (1-4, C, T, L, SC Move) in order.
+*   **오늘의 수련 생성 (Random Routine):** Generates unique routines randomly. By default, it selects 3 routines. If "호흡 집중" or "자애 명상" is included, it automatically adds one more routine for a total of 4. It also ensures those two meditations are never selected simultaneously.
+*   **SNPE 기본동작 (Basic Movements):** Displays the eight core SNPE movements (1-4, C, T, L, SC Move) in order in a grid layout.
+*   **집중 수련 (Intensive Practice):** Displays six key intensive movements: 
+    *   1번 동작 (30 reps, 80s interval)
+    *   2번 동작 (30 mins)
+    *   3번 동작 (30 reps, 60s interval)
+    *   4번 동작 (1000 reps, 4.5s interval)
+    *   T무브 (1000 reps, 1.3s interval, rest every 30 reps for 30s)
+    *   L무브 (1000 reps, 2.3s interval, rest every 50 reps for 40s)
 *   **Interactive Timers & Counters:**
     *   **Time-based:** Countdown in `MM:SS` format.
-    *   **Rep-based:** Decrements repetition count at specific intervals (e.g., T-move every 2 seconds).
-    *   **Audio Feedback:** Plays a sound when a timer starts, reaches midpoint, and completes.
+    *   **Rep-based:** Decrements repetition count at specific intervals (e.g., T-move every 1.3s, L-move every 2.3s, 4번 동작 every 4.5s).
+    *   **Audio Feedback:** Plays a sound when a timer starts, reaches midpoint, and completes. Volume is set to 20% for a subtle experience.
     *   **Exclusive Timers:** Starting a new timer automatically stops any other running timer.
 *   **Dynamic UI:** All updates happen dynamically without a page reload.
 
-## Current Change: SNPE Basic Movements Button
+## Current Change: Reduce Audio Volume
 
 ### Plan and Steps
 
-1.  **Modify `index.html`:**
-    *   Wrapped the buttons in a `.button-group` div.
-    *   Added the "SNPE 기본동작" button with ID `snpe-basic-btn`.
-2.  **Modify `style.css`:**
-    *   Added styles for `.button-group` to align buttons horizontally with a gap.
-    *   Generalised button styles and added specific colors for `generate-btn` (purple) and `snpe-basic-btn` (teal).
-    *   Added hover effects and subtle shadows.
-3.  **Modify `main.js`:**
-    *   Defined `snpeBasicNames` array containing the 8 core movement names.
-    *   Created a `clearTimers()` helper function to reset state and clear intervals.
-    *   Added an event listener for `snpeBasicBtn` that filters the `routines` array for the 8 core movements and displays them.
-    *   Refactored `generateBtn` listener to use `clearTimers()`.
-4.  **Update `blueprint.md`:**
-    *   Updated the overview, design, and features sections to include the new button and layout changes.
+1.  **Modify `main.js`:**
+    *   Set `startSound.volume` and `completionSound.volume` to `0.2` (20%).
+2.  **Update `blueprint.md`:**
+    *   Documented the volume reduction to 20%.
